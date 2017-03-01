@@ -2,6 +2,8 @@ package com.example.model;
 
 import javax.print.attribute.standard.DateTimeAtCompleted;
 
+import com.example.model.list.ListFxMerchant;
+
 public class Transaction {
 
 	private String id;
@@ -18,9 +20,9 @@ public class Transaction {
 	private String code;
 	private String message;
 	
-	private TransactionFx fx;
+	private ListFxMerchant fx;
 	private Merchant merchant;
-	private Customer customer;
+	private CustomerClient customer;
 	
 	
 	public String getId() {
@@ -101,10 +103,10 @@ public class Transaction {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public TransactionFx getFx() {
+	public ListFxMerchant getFx() {
 		return fx;
 	}
-	public void setFx(TransactionFx fx) {
+	public void setFx(ListFxMerchant fx) {
 		this.fx = fx;
 	}
 	public Merchant getMerchant() {
@@ -113,10 +115,10 @@ public class Transaction {
 	public void setMerchant(Merchant merchant) {
 		this.merchant = merchant;
 	}
-	public Customer getCustomer() {
+	public CustomerClient getCustomer() {
 		return customer;
 	}
-	public void setCustomer(Customer customer) {
+	public void setCustomer(CustomerClient customer) {
 		this.customer = customer;
 	}
 }

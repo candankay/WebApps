@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Client Info</title>
+</head>
+<body>
+
+<table>
+	<tr>
+		<th>Number</th>
+		<th>E-mail</th>
+		<th>BirthDay</th>
+	</tr>
+	<tr th:each="c:${customer}">
+		<td th:text="${c.number}"></td>
+		<td th:text="${c.email}"></td>
+		<td th:text="${c.birthday}"></td>
+	</tr>
+</table>
+</body>
+</html>

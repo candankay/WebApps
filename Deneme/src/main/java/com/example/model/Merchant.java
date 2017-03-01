@@ -14,6 +14,14 @@ public class Merchant {
 	private String descriptor;
 	private String secretKey;
 	private String comType;
+	private String createDate;
+	
+	public String getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
 	public int getId() {
 		return id;
 	}

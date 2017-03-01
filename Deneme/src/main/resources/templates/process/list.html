@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+<meta charset="UTF-8"/>
+<title>Listeleme</title>
 </head>
 <body>
+
+
+		<h1>List Criteria</h1>
+        <form th:action="@{/process/list}" method="post">
+            <label for="fromDate">Start Date</label>:
+            <input type="text" id="fromDate" name="fromDate" text = "From Date"/><br/>
+            <label for="toDate">End Date</label>:
+			<input type="text" id="toDate" name="toDate" text = "To Date"/> <br/>
+            <input type="submit" value="Search" />
+        </form>
+
+<table>
+	<tr>
+		<th>Merchant</th>
+		<th>Converted Amunt</th>
+		<th>Original Amount</th>
+		<th>Create Time</th>
+		<th>Update Time</th>
+		<th>Refundable</th>
+		<th>Merchant Info</th>
+		<th>Transaction Info</th>
+		<th>Client Info</th>
+	</tr>
+
+
+<tr th:each="data:${data}">
+	<td th:text="${data.merchant.name}"></td>
+	<td th:text="${data.fx.merchant.convertedAmount} + ${data.fx.merchant.convertedCurrency}"></td>
+	<td th:text="${data.fx.merchant.originalAmount} + ${data.fx.merchant.originalCurrency}"></td>
+	<td th:text="${data.created_at}"></td>
+	<td th:text="${data.updated_at}"></td>
+	<td th:text="${data.refundable  != null} ? ${data.refundable}">Unknown</td>
+	<td><a th:href="@{/process/merchant?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
+	<td><a th:href="@{/process/client?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
+	
+<!-- <td><a th:href="@{/ogrenci/kayit-duzenle?id=__${ogrenci.id}__}"><span>Duzenle</span></a></td> -->
+</tr>
+</table>
 
 </body>
 </html>

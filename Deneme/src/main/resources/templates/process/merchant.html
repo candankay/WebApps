@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>Merchant Info</title>
+</head>
+<body>
+
+<table>
+	<tr>
+		<th>Id</th>
+		<th>Name</th>
+		<th>Descriptor</th>
+	</tr>
+	<tr th:each="mr:${merchant}">
+		<td th:text="${mr.id}"></td>
+		<td th:text="${mr.name}"></td>
+		<td th:text="${mr.descriptor}"></td>
+	</tr>
+</table>
+</body>
+</html>
