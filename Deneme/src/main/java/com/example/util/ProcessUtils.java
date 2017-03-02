@@ -104,6 +104,8 @@ public class ProcessUtils {
 			sObj = mapper.readValue(mr.getBytes() , CustomerShipping.class);
 			bObj = mapper.readValue(mr.getBytes() , CustomerBilling.class);
 			cObj = mapper.readValue(mr.getBytes() , CustomerClient.class);
+			cObj.setBillPerson(sObj);
+			cObj.setShipPerson(bObj);
 			return cObj;
 		} catch (JSONException e) {
 			e.printStackTrace();

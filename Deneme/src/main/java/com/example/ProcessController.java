@@ -1,9 +1,8 @@
 package com.example;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,7 +14,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.model.CustomerClient;
 import com.example.model.Merchant;
@@ -28,92 +29,190 @@ import com.example.ws.ConnectClearSettle;
 public class ProcessController {
 	
 	public ConnectClearSettle cls;
-	
-	@RequestMapping("login")
-	String login(@RequestParam String username,@RequestParam String password,Model model,HttpServletRequest request) {
-    		System.out.println("candan");
-    		System.out.println("kayabaşı");
-    		JSONObject params = new JSONObject();
-    		try {
-				params.put("email", username);
-	    		params.put("password", password);
-	    		cls = new ConnectClearSettle();
-	    		JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_LOGIN, params, null);
-	    		model.addAttribute("username", username);
-	    		model.addAttribute("password", password);
-	    		if(cvp != null && cvp.get("token") != null){
-	    			model.addAttribute("token", cvp.get("token").toString());
-	    			request.getSession().setAttribute("token", cvp.get("token").toString());
-	    		}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-          return "process/login";
-    }
-	
+
 	@RequestMapping("client")
 	String client(@RequestParam String transactionId,Model model ,HttpServletRequest request) {
-
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(!token.isPresent()){
+			model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+			return "index";
+		}
 		try {
 			cls = new ConnectClearSettle();
 			JSONObject js = new JSONObject();
 			js.put("transactionId",transactionId);
-			JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_CLIENT, js, request.getSession().getAttribute("token").toString());
+			JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_CLIENT, js, request.getSession().getAttribute("token").toString(),RequestMethod.GET.toString());
     		if(cvp != null){
     			List<CustomerClient> mr = new ArrayList<CustomerClient>();
     			mr.add(ProcessUtils.createClientDataFromJSON(cvp));
     			model.addAttribute("customer",mr);
     		}
+    		else{
+    			model.addAttribute("customerError", "Customer Bilgisi Sunucudan Alınamadı");
+    		}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			model.addAttribute("customerError", "Customer Bilgisi Sunucudan Alınamadı");
 		}
           return "process/client";
     }
 	
 	@RequestMapping("merchant")
 	String merchant(@RequestParam String transactionId,Model model ,HttpServletRequest request) {
-
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(!token.isPresent()){
+			model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+			return "index";
+		}
 		try {
 			cls = new ConnectClearSettle();
 			JSONObject js = new JSONObject();
 			js.put("transactionId",transactionId);
-			JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_MERCHANT, js, request.getSession().getAttribute("token").toString());
+			JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_MERCHANT, js, request.getSession().getAttribute("token").toString(),RequestMethod.GET.toString());
     		if(cvp != null){
     			List<Merchant> mr = new ArrayList<Merchant>();
     			mr.add(ProcessUtils.createMerchantDataFromJSON(cvp));
     			model.addAttribute("merchant",mr);
     		}
+    		else{
+    			model.addAttribute("merchantError","Merchant Bilgisi Sunucudan Alınamadı");
+    		}
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			model.addAttribute("merchantError","Merchant Bilgisi Sunucudan Alınamadı");
 		}
           return "process/merchant";
     }
 	
 	@GetMapping("list")
-	String list(Model model ,HttpServletRequest request) {
+	String list(@RequestParam(required=false) String fromDate,@RequestParam(required=false) String toDate,
+			@RequestParam(required=false) String page,Model model ,HttpServletRequest request) {
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(token.isPresent()){
+			cls = new ConnectClearSettle();
+			if(page != null && !page.equals("") && 
+					fromDate != null && !fromDate.equals("") &&
+					toDate != null && !toDate.equals("")){
+				JSONObject js = new JSONObject();
+	    		try {
+					js.put("fromDate",fromDate);
+		    		js.put("toDate",toDate);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				model = getListModel(fromDate,toDate,model,
+						cls.getDataFromURL(page, js, request.getSession().getAttribute("token").toString(),RequestMethod.GET.toString()));
+			}
+			return "process/list";
+		}
+		else {
+			model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+			return "index";
+		}
+    }
+	
+	private Model getListModel(String fromDate,String toDate,Model model,JSONObject cvp){
+		try{
+			model.addAttribute("per_page",cvp.get("per_page").toString());
+			model.addAttribute("next_page_url",cvp.get("next_page_url").toString());
+			model.addAttribute("from",cvp.get("from").toString());
+			model.addAttribute("to",cvp.get("to").toString());
+			model.addAttribute("current_page",cvp.get("current_page").toString());
+			model.addAttribute("prev_page_url",cvp.get("prev_page_url").toString());
+			
+			JSONArray ja_data = cvp.getJSONArray("data");
+			int size = (int)ja_data.length();
+			List<ListData> list = new ArrayList<ListData>();
+			for(int i=1; i<size; i++) 
+			{
+			    JSONObject jObj = ja_data.getJSONObject(i);
+			    list.add( ProcessUtils.createListDataFromJSON(jObj));
+			}
+			if(!list.isEmpty())
+				model.addAttribute("data",list);
+			if(fromDate!= null && !fromDate.equals(""))
+				model.addAttribute("fromDate",fromDate);
+			if(toDate!= null && !toDate.equals(""))
+	    		model.addAttribute("toDate",toDate);
+			return model;
+		}
+		catch(JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
+	
+	@PostMapping("list")
+	String list(@RequestParam(required=false) String fromDate,@RequestParam(required=false) String toDate,
+			Model model ,HttpServletRequest request) {
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(!token.isPresent()){
+			model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+			return "index";
+		}
+		else {
+			if(fromDate.equals("") || toDate.equals("")){
+				model.addAttribute("tarihlerBos","Başlangıç veya Bitiş Tarihi Girilmedi");
+				return "process/list";
+			}
+			else if(!fromDate.equals("") || !toDate.equals("")){
+				cls = new ConnectClearSettle();
+				JSONObject js = new JSONObject();
+	    		try {
+					js.put("fromDate",fromDate);
+		    		js.put("toDate",toDate);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+	    		model = getListModel(fromDate,toDate,model,
+	    				cls.getDataFromURL(ProcessUtils.URL_LIST, js, request.getSession().getAttribute("token").toString(), RequestMethod.POST.toString()));
+			}
+		}
           return "process/list";
     }
 	
-	@PostMapping("list")
-	String list(@RequestParam String fromDate,@RequestParam String toDate,Model model ,HttpServletRequest request) {
+	@GetMapping(value="report")
+	String report(Model model ,HttpServletRequest request){
+		return "process/report";
+	}
+	
+	@GetMapping(value="reportData")
+	@ResponseBody
+	String report(@RequestParam String data,Model model ,HttpServletRequest request) {
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(!token.isPresent()){
+			model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+			return "index";
+		}
+		else {
+			if(data== null || data.equals(""))
+				return "process/report";
+			JSONObject json=null,cvp=null;
+			try {
+				cls = new ConnectClearSettle();
+				json = new JSONObject(data);
+				cvp = cls.getDataFromURL(ProcessUtils.URL_REPORT, json, request.getSession().getAttribute("token").toString(),RequestMethod.GET.toString());
+			} catch (JSONException e) {
+				e.printStackTrace();
+				return "error";
+			}
+			model.addAttribute("data",cvp);
+			return cvp.toString();
+		}
+    }
+	
+	@RequestMapping("transaction")
+	String transaction(@RequestParam String transactionId,Model model ,HttpServletRequest request) {
     		System.out.println("canda1n");
     		System.out.println("kayabaşı1");
     		try {
 	    		cls = new ConnectClearSettle();
 	    		JSONObject js = new JSONObject();
-	    		js.put("fromDate",fromDate);
-	    		js.put("toDate",toDate);
-	    		JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_LIST, js, request.getSession().getAttribute("token").toString());
-	    		if(cvp != null){
-	    			model.addAttribute("per_page",cvp.get("per_page").toString());
-	    			model.addAttribute("next_page_url",cvp.get("next_page_url").toString());
-	    			model.addAttribute("from",cvp.get("from").toString());
-	    			model.addAttribute("to",cvp.get("to").toString());
-	    			model.addAttribute("current_page",cvp.get("current_page").toString());
-	    			model.addAttribute("prev_page_url",cvp.get("prev_page_url").toString());
-	    			
+				js.put("transactionId",transactionId);
+	    		JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_TRANSACTION, js, request.getSession().getAttribute("token").toString(),RequestMethod.GET.toString());
+	    		/*if(cvp != null){
+	    			ProcessUtils.createListDataFromJSON(jObj);
 	    			JSONArray ja_data = cvp.getJSONArray("data");
 	    			int size = (int)cvp.get("to");
 	    			List<ListData> list = new ArrayList<ListData>();
@@ -123,12 +222,14 @@ public class ProcessController {
 	    			    list.add( ProcessUtils.createListDataFromJSON(jObj));
 	    			} 
 	    			model.addAttribute("data",list);
-	    		}
+	    		}*/
+	    		model.addAttribute("cvp", cvp);
+	    		System.out.println(cvp.toString());
 	    			
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-          return "process/list";
+          return "process/transaction";
     }
 
 }

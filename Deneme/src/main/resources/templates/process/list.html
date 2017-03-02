@@ -7,42 +7,57 @@
 <body>
 
 
-		<h1>List Criteria</h1>
+		<h1>Arama Kriterleri</h1>
         <form th:action="@{/process/list}" method="post">
+            <p th:if="${tarihlerBos}" class="error">
+				<td th:text="${tarihlerBos}"></td>
+			</p>
             <label for="fromDate">Start Date</label>:
             <input type="text" id="fromDate" name="fromDate" text = "From Date"/><br/>
             <label for="toDate">End Date</label>:
 			<input type="text" id="toDate" name="toDate" text = "To Date"/> <br/>
             <input type="submit" value="Search" />
         </form>
+ <br/>
+ <div th:if="${prev_page_url} != null and ${prev_page_url} != 'null'">
+ 	<a th:href="@{/process/list(page=${prev_page_url},fromDate=${fromDate},toDate=${toDate})}">Önceki Sayfa</a>
+ </div>
+ <div th:if="${next_page_url} != null and ${next_page_url} != 'null'">
+ <p th:if="${next_page_url!=null}">
+ 	<a th:href="@{/process/list(page=${next_page_url},fromDate=${fromDate},toDate=${toDate})}">Sonraki Sayfa</a>
+ </p>
+ </div>
+ <br/><br/>
 
-<table>
-	<tr>
-		<th>Merchant</th>
-		<th>Converted Amunt</th>
-		<th>Original Amount</th>
-		<th>Create Time</th>
-		<th>Update Time</th>
-		<th>Refundable</th>
-		<th>Merchant Info</th>
-		<th>Transaction Info</th>
-		<th>Client Info</th>
-	</tr>
+<div th:if="${data} != null">
+<table BORDER="5" BORDERCOLOR="#808080" CELLSPACING="1" WIDTH="800">
+<caption><FONT FACE="ARIAL" SIZE="5">Liste Kayıtları</FONT></caption>
 
-
-<tr th:each="data:${data}">
-	<td th:text="${data.merchant.name}"></td>
-	<td th:text="${data.fx.merchant.convertedAmount} + ${data.fx.merchant.convertedCurrency}"></td>
-	<td th:text="${data.fx.merchant.originalAmount} + ${data.fx.merchant.originalCurrency}"></td>
-	<td th:text="${data.created_at}"></td>
-	<td th:text="${data.updated_at}"></td>
-	<td th:text="${data.refundable  != null} ? ${data.refundable}">Unknown</td>
-	<td><a th:href="@{/process/merchant?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
-	<td><a th:href="@{/process/client?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
+		<tr>
+			<th>Merchant</th>
+			<th>Converted Amunt</th>
+			<th>Original Amount</th>
+			<th>Create Time</th>
+			<th>Update Time</th>
+			<th>Refundable</th>
+			<th>Merchant Info</th>
+			<th>Client Info</th>
+			<th>Transaction Info</th>
+		</tr>
 	
-<!-- <td><a th:href="@{/ogrenci/kayit-duzenle?id=__${ogrenci.id}__}"><span>Duzenle</span></a></td> -->
-</tr>
+	
+		<tr th:each="data:${data}">
+			<td th:text="${data.merchant.name}"></td>
+			<td th:text="${data.fx.merchant.convertedAmount} + ${data.fx.merchant.convertedCurrency}"></td>
+			<td th:text="${data.fx.merchant.originalAmount} + ${data.fx.merchant.originalCurrency}"></td>
+			<td th:text="${data.created_at}"></td>
+			<td th:text="${data.updated_at}"></td>
+			<td th:text="${data.refundable  != null} ? ${data.refundable}">Unknown</td>
+			<td><a th:href="@{/process/merchant?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
+			<td><a th:href="@{/process/client?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
+			<td><a th:href="@{/process/transaction?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
+		</tr>
 </table>
-
+</div>
 </body>
 </html>

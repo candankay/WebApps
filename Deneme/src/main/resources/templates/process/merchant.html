@@ -1,12 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8"/>
 <title>Merchant Info</title>
 </head>
 <body>
-
-<table>
+<p th:if="${merchantError}" class="error">
+	<h1><td th:text="${merchantError}"></td></h1>
+</p>
+<div th:if="${merchant} != null">
+<table BORDER="5" BORDERCOLOR="#808080" CELLSPACING="1" WIDTH="350">
+<caption><FONT FACE="ARIAL" SIZE="5">Merchant Kayıtları</FONT></caption>
 	<tr>
 		<th>Id</th>
 		<th>Name</th>
@@ -18,5 +22,6 @@
 		<td th:text="${mr.descriptor}"></td>
 	</tr>
 </table>
+</div>
 </body>
 </html>

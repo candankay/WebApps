@@ -5,8 +5,12 @@
 <title>Client Info</title>
 </head>
 <body>
-
-<table>
+<p th:if="${customerError}" class="error">
+	<h1><td th:text="${customerError}"></td></h1>
+</p>
+<div th:if="${customer} != null">
+<table BORDER="5" BORDERCOLOR="#808080" CELLSPACING="1" WIDTH="350">
+<caption><FONT FACE="ARIAL" SIZE="5">Client Kayıtları</FONT></caption>
 	<tr>
 		<th>Number</th>
 		<th>E-mail</th>
@@ -18,5 +22,6 @@
 		<td th:text="${c.birthday}"></td>
 	</tr>
 </table>
+</div>
 </body>
 </html>

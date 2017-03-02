@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"/>
+<title>Merchant-Acquirer Report</title>
+</head>
+<script type="text/javascript" th:src="@{/js/jquery-3.1.1.min.js}"></script>
+<script type="text/javascript">
+
+function sonucGetir() {
+	
+    if ($('#fromDate').val() == '' || $('#toDate').val() == '' ||
+    		$('#merchant').val() == '' || $('#acquirer').val() == ''){
+    	alert("Parametreler Eksik");
+    	return;
+    }
+    var params ={ fromDate: $('#fromDate').val(), 
+        	toDate:$('#toDate').val(),
+        	merchant:$('#merchant').val(),
+        	acquirer:$('#acquirer').val()
+        	};
+    $.ajax({
+        type: "GET",
+        url: "reportData?data="+encodeURIComponent(JSON.stringify(params)),
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader("Accept", "application/json");
+            xhr.setRequestHeader("Content-Type", "application/json");
+        },
+         success:function(data){
+        	 console.log(data);
+        	 var res = $.parseJSON( data ).response;
+        	 console.log(res);
+         }
+   });
+}
+
+</script>
+<body>
+
+<form>
+    <span >Report Details</span>
+    <div class="listBlock">
+        <div class="search-block">
+            <label for="fromDate">Start Date</label>:
+            <input type="text" id="fromDate" name="fromDate" text = "From Date"/><br/>
+            <label for="toDate">End Date</label>:
+			<input type="text" id="toDate" name="toDate" text = "To Date"/> <br/>
+        	<label for="merchant">Merchant:</label>
+            <input type="text" id="merchant" name="merchant" text="Merchant Id"/><br />
+        	<label for="acquirer">Search label:</label>
+            <input type="text" id="acquirer" name="acquirer" text="Acquirer Id"/><br/>
+            <button id="searchButton" name="searchButton" onclick="sonucGetir()" type="button">Search button</button>
+        </div>
+
+        <!-- Results block -->
+        <div id="resultsBlock">
+
+	       <table id="table" class="hidden">
+	                <tr>
+	                    <th>Count</th>
+						<th>Total</th>
+						<th>Currency</th>
+	                </tr>
+	        </table>
+        </div>
+    </div>
+</form>
+
+
+</body>
+</html>

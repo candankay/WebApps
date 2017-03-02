@@ -18,7 +18,7 @@ public class ConnectClearSettle {
 	private HttpURLConnection connection;
 	private OutputStreamWriter outWriter;
 	
-	public JSONObject getDataFromURL(String url,JSONObject params,String auth){
+	public JSONObject getDataFromURL(String url,JSONObject params,String auth,String type){
 		try {
 			this.url = new URL(url);
 			this.connection = (HttpURLConnection) this.url.openConnection();
@@ -26,11 +26,11 @@ public class ConnectClearSettle {
 			connection.setDoInput(true);
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestMethod("POST");
+			connection.setRequestMethod(type);
 			if(!(auth == null || auth.equals("")))
 				connection.setRequestProperty ("Authorization",auth);
 			outWriter = new OutputStreamWriter(connection.getOutputStream());
-			outWriter.write(params.toString());
+			outWriter.write(params!=null ? params.toString() : "");
 			outWriter.flush();
 			StringBuilder sb = new StringBuilder();  
 			if (HttpURLConnection.HTTP_OK == connection.getResponseCode()) {
