@@ -21,15 +21,16 @@ public class HomeController {
 	
 	private ConnectClearSettle cls;
 	
-	@GetMapping("")
+	@GetMapping("/")
 	public String index(@RequestParam(required=false) String tip,Model model) {
 		if(tip != null && tip.equals("1"))
 			model.addAttribute("signOut","Çıkış Başarılı");
-		
+		else
+			model.addAttribute("msg","Giriş Başarılı");
 		return "index";
 	}
 	
-	@PostMapping("")
+	@PostMapping("/")
 	public String index(@RequestParam String username,@RequestParam String password,Model model,HttpServletRequest request) {
 		Optional<Object> token = Optional.ofNullable(request.getAttribute("token"));
 		if(!token.isPresent()){
