@@ -10,6 +10,9 @@
         <p th:if="${loginError}" class="error">
 			<td th:text="${loginError}"></td>
 		</p>
+		 <p th:if="${signOut}" class="error">
+			<td th:text="${loginError}"></td>
+		</p>
         <form  th:action="@{/}" method="post">
             <label for="username">Username</label>:
             <input type="text" id="username" name="username" autofocus="autofocus" /> <br />
@@ -17,7 +20,6 @@
             <input type="password" id="password" name="password" /> <br />
             <input type="submit" value="Log in" />
         </form>
-       <!--   <p><a href="../index.html" th:href="@{/index.html}">Back to home page</a></p> -->
      </div>
 </body>
 </html>

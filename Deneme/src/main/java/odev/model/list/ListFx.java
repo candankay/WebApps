@@ -1,4 +1,4 @@
-package com.example.model.list;
+package odev.model.list;
 
 public class ListFx {
 	private ListFxMerchant merchant;

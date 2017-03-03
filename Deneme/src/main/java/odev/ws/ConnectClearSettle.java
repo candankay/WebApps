@@ -1,4 +1,4 @@
-package com.example.ws;
+package odev.ws;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import java.net.URL;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.util.ProcessUtils;
+import odev.util.ProcessUtils;
 
 public class ConnectClearSettle {
 	private URL url;

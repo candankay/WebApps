@@ -1,4 +1,4 @@
-package com.example.model;
+package odev.model;
 
 public class CustomerShipping {
 

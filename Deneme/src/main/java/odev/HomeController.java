@@ -1,4 +1,4 @@
-package com.example;
+package odev;
 
 import java.util.Optional;
 
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.util.ProcessUtils;
-import com.example.ws.ConnectClearSettle;
+import odev.util.ProcessUtils;
+import odev.ws.ConnectClearSettle;
  
 @Controller
 public class HomeController {
@@ -22,8 +22,10 @@ public class HomeController {
 	private ConnectClearSettle cls;
 	
 	@GetMapping("")
-	public String index(Model model) {
-
+	public String index(@RequestParam(required=false) String tip,Model model) {
+		if(tip != null && tip.equals("1"))
+			model.addAttribute("signOut","Çıkış Başarılı");
+		
 		return "index";
 	}
 	

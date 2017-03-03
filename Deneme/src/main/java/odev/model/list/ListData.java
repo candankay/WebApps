@@ -1,7 +1,7 @@
-package com.example.model.list;
+package odev.model.list;
 
-import com.example.model.Acquirer;
-import com.example.model.CustomerPerson;
+import odev.model.Acquirer;
+import odev.model.CustomerPerson;
 
 public class ListData {
 	private ListFx fx;

@@ -42,7 +42,6 @@
 			<th>Refundable</th>
 			<th>Merchant Info</th>
 			<th>Client Info</th>
-			<th>Transaction Info</th>
 		</tr>
 	
 	
@@ -55,7 +54,6 @@
 			<td th:text="${data.refundable  != null} ? ${data.refundable}">Unknown</td>
 			<td><a th:href="@{/process/merchant?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
 			<td><a th:href="@{/process/client?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
-			<td><a th:href="@{/process/transaction?transactionId=__${data.transaction.merchant.transactionId}__}"><span>Info</span></a></td>
 		</tr>
 </table>
 </div>

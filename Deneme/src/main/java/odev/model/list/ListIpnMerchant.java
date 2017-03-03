@@ -1,4 +1,4 @@
-package com.example.model.list;
+package odev.model.list;
 
 public class ListIpnMerchant {
 	private String date;

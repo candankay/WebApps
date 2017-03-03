@@ -1,4 +1,4 @@
-package com.example;
+package odev;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.model.CustomerClient;
-import com.example.model.Merchant;
-import com.example.model.list.ListData;
-import com.example.util.ProcessUtils;
-import com.example.ws.ConnectClearSettle;
+import odev.model.CustomerClient;
+import odev.model.Merchant;
+import odev.model.list.ListData;
+import odev.util.ProcessUtils;
+import odev.ws.ConnectClearSettle;
 
 @RequestMapping("/process")
 @Controller
@@ -30,6 +30,16 @@ public class ProcessController {
 	
 	public ConnectClearSettle cls;
 
+	@RequestMapping("welcome")
+	String welcome(Model model,HttpServletRequest request) {
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(token.isPresent()){
+			return "process/welcome";
+		}
+		model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+		return "index";
+	}
+	
 	@RequestMapping("client")
 	String client(@RequestParam String transactionId,Model model ,HttpServletRequest request) {
 		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
@@ -174,6 +184,11 @@ public class ProcessController {
 	
 	@GetMapping(value="report")
 	String report(Model model ,HttpServletRequest request){
+		Optional<Object> token = Optional.ofNullable(request.getSession().getAttribute("token"));
+		if(!token.isPresent()){
+			model.addAttribute("loginError","Kullanıcı Girişi Zaman Aşımına Uğradı");
+			return "index";
+		}
 		return "process/report";
 	}
 	
@@ -200,36 +215,6 @@ public class ProcessController {
 			model.addAttribute("data",cvp);
 			return cvp.toString();
 		}
-    }
-	
-	@RequestMapping("transaction")
-	String transaction(@RequestParam String transactionId,Model model ,HttpServletRequest request) {
-    		System.out.println("canda1n");
-    		System.out.println("kayabaşı1");
-    		try {
-	    		cls = new ConnectClearSettle();
-	    		JSONObject js = new JSONObject();
-				js.put("transactionId",transactionId);
-	    		JSONObject cvp = cls.getDataFromURL(ProcessUtils.URL_TRANSACTION, js, request.getSession().getAttribute("token").toString(),RequestMethod.GET.toString());
-	    		/*if(cvp != null){
-	    			ProcessUtils.createListDataFromJSON(jObj);
-	    			JSONArray ja_data = cvp.getJSONArray("data");
-	    			int size = (int)cvp.get("to");
-	    			List<ListData> list = new ArrayList<ListData>();
-	    			for(int i=1; i<size; i++) 
-	    			{
-	    			    JSONObject jObj = ja_data.getJSONObject(i);
-	    			    list.add( ProcessUtils.createListDataFromJSON(jObj));
-	    			} 
-	    			model.addAttribute("data",list);
-	    		}*/
-	    		model.addAttribute("cvp", cvp);
-	    		System.out.println(cvp.toString());
-	    			
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-          return "process/transaction";
     }
 
 }
